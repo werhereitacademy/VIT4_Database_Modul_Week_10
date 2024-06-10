@@ -48,7 +48,8 @@ try:
         gender ,
         hire_date 
     ) VALUES
-    (17679,'Robert','Gilmore',110000,'Operation Director','Male','2018-09-04')
+    (17679,'Robert','Gilmore',110000,'Operation Director','Male','2018-09-04'),
+    (26650,'Elvis','Ritter',86000,'Sales Manager','Male','2017-11-24')
 
     """
     cursor.execute(insert_table_query)
@@ -59,7 +60,7 @@ try:
 except Exception as e:
     print("Bağlantı hatası:", e)
 finally:
-    # Bağlantıyı kapatın
+    # Bağlantıyı kapatın"""  """
     if cursor:
         cursor.close()
     if connection:
