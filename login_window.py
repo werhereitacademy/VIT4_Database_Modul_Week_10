@@ -1,8 +1,9 @@
-import psycopg2
+
 import pickle
 import os
 from PyQt6 import QtWidgets, QtGui, QtCore
 from PyQt6.QtWidgets import QMessageBox
+import psycopg2
 
 database_name = "CRM"
 user = "postgres"
@@ -239,7 +240,7 @@ class Ui_LoginMainWindow(object):
             self.userWindow.show()
             self.main_window.close()
         else:
-            QMessageBox.warning(self, "Hata", "Kullanıcı adı veya şifre hatalı!")
+            QMessageBox.warning(self.centralwidget, "Hata", "Kullanıcı adı veya şifre hatalı!")
             self.admin_username_lineEdit_3.clear()
             self.admin_password_lineEdit_4.clear()
 
