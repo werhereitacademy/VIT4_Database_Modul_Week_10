@@ -14,7 +14,7 @@ selected_columns = [ 'Zaman damgası','Şu anki durumunuz',
        'Şu anda herhangi bir projeye dahil misiniz? (Öğretmenlik projesi veya Leerwerktraject v.s)',
        'IT sektöründe hangi bölüm veya bölümlerde çalışmak istiyorsunuz ,bir den fazla seçenek seçebilirsiniz',
        'Neden VIT projesine katılmak istiyorsunuz?birden fazla seçenek işaretleyebilirsiniz',
-       'Basvuru Donemi']
+       'Basvuru Donemi','Mentor gorusmesi']
 
 # CSV dosyasını okuma
 df = pd.read_csv(csv_file_path)
