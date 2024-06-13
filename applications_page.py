@@ -27,12 +27,7 @@ try:
 except Exception as e:
     print(f"Bağlantı hatası: {e}")
 
-# Google Sheets'ten verileri çeken fonksiyon
-def list_column_values(service, spreadsheet_id, range_name):
-    sheet = service.spreadsheets()
-    result = sheet.values().get(spreadsheetId=spreadsheet_id, range=range_name).execute()
-    values = result.get('values', [])
-    return values
+
 
 class ApplicationWindow(QMainWindow):
     def __init__(self):
@@ -226,15 +221,26 @@ class ApplicationWindow(QMainWindow):
 
     def load_all_applications(self):
         try:
-            creds = authenticate()
-            service = build('sheets', 'v4', credentials=creds)
-            spreadsheet_id = '1Ls6wq8vi_fKfVIqYiTpx3RrC4KZvPlT60D63sXboNbM'  # Kendi Spreadsheet ID'nizi ekleyin
-            range_name = 'Sayfa1!A1:V40'  # Kendi veri aralığınızı ekleyin
-            data = list_column_values(service, spreadsheet_id, range_name)
-            print("Data retrieved from Google Sheets:", data)  # Hata ayıklama için veriyi yazdırın
-            self.load_data(data)
+            # kursiyerler ve basvurular tablolarını JOIN ile birleştiren sorgu
+            join_query = """
+            SELECT k.AdSoyad, k.MailAdresi, k.TelefonNumarası, k.PostaKodu, b.ZamanDamgası, b.SuAnkiDurum
+            FROM kursiyerler k
+            INNER JOIN basvurular b ON k.KursiyerID = b.KursiyerID
+            """
+            cursor.execute(join_query)
+            
+            # Sonuçları alın
+            combined_results = cursor.fetchall()
+            
+            # Sütun başlıklarını ekleyin
+            headers = ["AdSoyad", "MailAdresi", "TelefonNumarası", "PostaKodu", "ZamanDamgası", "SuAnkiDurum"]
+            combined_results.insert(0, headers)
+
+            # Verileri yükleyin
+            self.load_data(combined_results)
         except Exception as e:
             print(f"Error loading data: {e}")
+
 
     def find_multiple_registrations(self):
         try:
