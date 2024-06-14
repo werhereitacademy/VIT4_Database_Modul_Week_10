@@ -20,6 +20,7 @@
 9. Find the hiring date and department of the highest paid employee
 10. Find the hiring date and department of the lowest paid employee
 
+
 ## TASK_2
 
 Sizlerden asagidaki linktte detayli anlatimi bulunan mini projeyi tamamlamaniz beklenmektedir.
