@@ -220,26 +220,55 @@ class ApplicationWindow(QMainWindow):
             print(f"Error finding combined language levels: {e}")
 
     def load_all_applications(self):
+        
         try:
             # kursiyerler ve basvurular tablolarını JOIN ile birleştiren sorgu
             join_query = """
-            SELECT k.AdSoyad, k.MailAdresi, k.TelefonNumarası, k.PostaKodu, b.ZamanDamgası, b.SuAnkiDurum
+            SELECT k.AdSoyad,k.MailAdresi, k.TelefonNumarasi, k.PostaKodu,ZamanDamgasi,
+            b.SuAnkiDurum,
+            b.ITPHEgitimKatilmak,
+            b.EkonomikDurum,
+            b.DilKursunaDevam ,
+            b.IngilizceSeviye,
+            b.HollandacaSeviye,
+            b.BaskiGoruyor,
+            b.BootcampBitirdi,
+            b.OnlineITKursu,
+            b.ITTecrube,
+            b.ProjeDahil,
+            b.CalismaIstegi,
+            b.NedenKatilmakIstiyor ,
+            b.BasvuruDonemi ,
+            b.MentorGorusmesi
             FROM kursiyerler k
             INNER JOIN basvurular b ON k.KursiyerID = b.KursiyerID
+          
             """
             cursor.execute(join_query)
             
             # Sonuçları alın
-            combined_results = cursor.fetchall()
+            duplicate_results = cursor.fetchall()
             
             # Sütun başlıklarını ekleyin
-            headers = ["AdSoyad", "MailAdresi", "TelefonNumarası", "PostaKodu", "ZamanDamgası", "SuAnkiDurum"]
-            combined_results.insert(0, )
-        
+            headers = ['AdSoyad', 'MailAdresi','TelefonNumarasi','PostaKodu','SuAnkiDurum','ITPHEgitimKatilmak','EkonomikDurum',
+            'DilKursunaDevam' ,
+            'IngilizceSeviye',
+            'HollandacaSeviye',
+            'BaskiGoruyor',
+            'BootcampBitirdi',
+            'OnlineITKursu',
+            'ITTecrube',
+            'ProjeDahil',
+            'CalismaIstegi',
+            'NedenKatilmakIstiyor' ,
+            'BasvuruDonemi' ,
+            'MentorGorusmesi' ]
+            duplicate_results.insert(0, headers)
+
             # Verileri yükleyin
-            self.load_data(combined_results)
+            self.load_data(duplicate_results)
         except Exception as e:
-            print(f"Error loading data: {e}")
+            print(f"Error finding all applications: {e}")
 
 
     def find_multiple_registrations(self):
@@ -266,13 +295,13 @@ class ApplicationWindow(QMainWindow):
             # Verileri yükleyin
             self.load_data(duplicate_results)
         except Exception as e:
-            print(f"Error finding duplicate applications: {e}")
+            print(f"Error finding multiple applications: {e}")
 
     def find_assigned_mentor_meetings(self):
         try:
             # kursiyerler ve basvurular tablolarını JOIN ile birleştiren sorgu
             join_query = """
-            SELECT k.AdSoyad,k.MailAdresi, k.telefonnumarası, k.PostaKodu, b.MentorGorusmesi FROM kursiyerler k
+            SELECT k.AdSoyad,k.MailAdresi, k.TelefonNumarasi, k.PostaKodu, b.MentorGorusmesi FROM kursiyerler k
             INNER JOIN basvurular b ON k.KursiyerID = b.KursiyerID 
             WHERE b.MentorGorusmesi= 'OK'
             """
@@ -282,7 +311,7 @@ class ApplicationWindow(QMainWindow):
             combined_results = cursor.fetchall()
             
             # Sütun başlıklarını ekleyin
-            headers = ["AdSoyad", "MailAdresi", "TelefonNumarası", "PostaKodu", "MentorGorusmesi", ]
+            headers = ["AdSoyad", "MailAdresi", "TelefonNumarasi", "PostaKodu", "MentorGorusmesi", ]
             combined_results.insert(0, headers)
 
             # Verileri yükleyin
@@ -295,7 +324,7 @@ class ApplicationWindow(QMainWindow):
         try:
             # kursiyerler ve basvurular tablolarını JOIN ile birleştiren sorgu
             join_query = """
-            SELECT k.AdSoyad,k.MailAdresi, k.telefonnumarası, k.PostaKodu, b.MentorGorusmesi FROM kursiyerler k
+            SELECT k.AdSoyad,k.MailAdresi, k.TelefonNumarasi, k.PostaKodu, b.MentorGorusmesi FROM kursiyerler k
             INNER JOIN basvurular b ON k.KursiyerID = b.KursiyerID 
             WHERE b.MentorGorusmesi= 'ATANMADI' OR b.MentorGorusmesi IS NULL
             """
@@ -305,7 +334,7 @@ class ApplicationWindow(QMainWindow):
             combined_results = cursor.fetchall()
             
             # Sütun başlıklarını ekleyin
-            headers = ["AdSoyad", "MailAdresi", "TelefonNumarası", "PostaKodu", "MentorGorusmesi", ]
+            headers = ["AdSoyad", "MailAdresi", "TelefonNumarasi", "PostaKodu", "MentorGorusmesi", ]
             combined_results.insert(0, headers)
 
             # Verileri yükleyin
