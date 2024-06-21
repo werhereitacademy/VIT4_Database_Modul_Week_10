@@ -1,0 +1,146 @@
+import psycopg2
+
+# PostgreSQL database info
+dbname = "dbcrm"
+user = "postgres"
+password = "123"
+host = "localhost"
+port = "5432"
+
+# Connect database
+conn = psycopg2.connect(
+    dbname=dbname,
+    user=user,
+    password=password,
+    host=host,
+    port=port
+)
+cur = conn.cursor()
+
+# employees table
+create_employees_table_query = '''
+CREATE TABLE employees (
+    emp_id INT PRIMARY KEY,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    salary INT,
+    job_title VARCHAR(100),
+    gender VARCHAR(10),
+    hire_date DATE
+);
+'''
+cur.execute(create_employees_table_query)
+conn.commit()
+
+# employees table data add
+insert_employees_data_query = '''
+INSERT INTO employees (emp_id, first_name, last_name, salary, job_title, gender, hire_date) VALUES
+(17679, 'Robert', 'Gilmore', 110000, 'Operations Director', 'Male', '2018-09-04'),
+(26650, 'Elvis', 'Ritter', 86000, 'Sales Manager', 'Male', '2017-11-24'),
+(30840, 'David', 'Barrow', 85000, 'Data Scientist', 'Male', '2019-12-02'),
+(49714, 'Hugo', 'Forester', 55000, 'IT Support Specialist', 'Male', '2019-11-22'),
+(51821, 'Linda', 'Foster', 95000, 'Data Scientist', 'Female', '2019-04-29'),
+(67323, 'Lisa', 'Wiener', 75000, 'Business Analyst', 'Female', '2018-08-09'),
+(70950, 'Rodney', 'Weaver', 87000, 'Project Manager', 'Male', '2018-12-20'),
+(71329, 'Gayle', 'Meyer', 77000, 'HR Manager', 'Female', '2019-06-28'),
+(76589, 'Jason', 'Christian', 99000, 'Project Manager', 'Male', '2019-01-21'),
+(97927, 'Billie', 'Lanning', 67000, 'Web Developer', 'Female', '2018-06-25');
+'''
+cur.execute(insert_employees_data_query)
+conn.commit()
+
+# departments table
+create_departments_table_query = '''
+CREATE TABLE departments (
+    emp_id INT PRIMARY KEY,
+    dept_name VARCHAR(50),
+    dept_id INT
+);
+'''
+cur.execute(create_departments_table_query)
+conn.commit()
+
+# departments table data add
+insert_departments_data_query = '''
+INSERT INTO departments (emp_id, dept_name, dept_id) VALUES
+(17679, 'Operations', 13),
+(26650, 'Marketing', 14),
+(30840, 'Operations', 13),
+(51821, 'Operations', 13),
+(67323, 'Marketing', 14),
+(76589, 'Operations', 13),
+(97927, 'Technology', 12);
+'''
+cur.execute(insert_departments_data_query)
+conn.commit()
+
+# 1. Find the employees who get paid more than Rodney Weaver
+cur.execute("SELECT salary FROM employees WHERE first_name = 'Rodney' AND last_name = 'Weaver';")
+rodney_salary = cur.fetchone()[0]
+cur.execute(f"SELECT emp_id, first_name, last_name, salary, job_title, gender, hire_date FROM employees WHERE salary > {rodney_salary};")
+employees_higher_salary = cur.fetchall()
+print("Employees paid more than Rodney Weaver:")
+for row in employees_higher_salary:
+    print(row)
+
+# 2. Find the average, min and max salaries
+cur.execute("SELECT AVG(salary) AS average_salary, MIN(salary) AS min_salary, MAX(salary) AS max_salary FROM employees;")
+salary_stats = cur.fetchone()
+print("\nSalary Statistics:")
+print(f"Average Salary: {salary_stats[0]}, Min Salary: {salary_stats[1]}, Max Salary: {salary_stats[2]}")
+
+# 3. Find the employees whose salary is more than 8700
+cur.execute("SELECT first_name, last_name, salary FROM employees WHERE salary > 8700;")
+high_salary_employees = cur.fetchall()
+print("\nEmployees with salary more than 8700:")
+for row in high_salary_employees:
+    print(row)
+
+# 4. Find the employees who work under the Operations department
+cur.execute("SELECT e.first_name, e.last_name FROM employees e JOIN departments d ON e.emp_id = d.emp_id WHERE d.dept_name = 'Operations';")
+operations_employees = cur.fetchall()
+print("\nEmployees in the Operations department:")
+for row in operations_employees:
+    print(row)
+
+# 5. Find the employees who work under the Technology department
+cur.execute("SELECT e.first_name, e.last_name FROM employees e JOIN departments d ON e.emp_id = d.emp_id WHERE d.dept_name = 'Technology';")
+technology_employees = cur.fetchall()
+print("\nEmployees in the Technology department:")
+for row in technology_employees:
+    print(row)
+
+# 6. Find the average salary of female employees
+cur.execute("SELECT AVG(salary) AS average_salary FROM employees WHERE gender = 'Female';")
+avg_female_salary = cur.fetchone()[0]
+print(f"\nAverage salary of female employees: {avg_female_salary}")
+
+# 7. Find the average salaries of each department
+cur.execute("SELECT d.dept_name, AVG(e.salary) AS average_salary FROM employees e JOIN departments d ON e.emp_id = d.emp_id GROUP BY d.dept_name;")
+dept_avg_salaries = cur.fetchall()
+print("\nAverage salaries of each department:")
+for row in dept_avg_salaries:
+    print(row)
+
+# 8. Find the oldest and newest employees
+cur.execute("SELECT emp_id, first_name, last_name, hire_date FROM employees ORDER BY hire_date ASC LIMIT 1;")
+oldest_employee = cur.fetchone()
+print(f"\nOldest employee: {oldest_employee}")
+
+cur.execute("SELECT emp_id, first_name, last_name, hire_date FROM employees ORDER BY hire_date DESC LIMIT 1;")
+newest_employee = cur.fetchone()
+print(f"Newest employee: {newest_employee}")
+
+# 9. Find the hiring date and department of the highest paid employee
+cur.execute("SELECT e.hire_date, d.dept_name FROM employees e JOIN departments d ON e.emp_id = d.emp_id WHERE e.salary = (SELECT MAX(salary) FROM employees);")
+highest_paid_employee_info = cur.fetchone()
+print(f"\nHiring date and department of the highest paid employee: {highest_paid_employee_info}")
+
+# 10. Find the hiring date and department of the lowest paid employee
+cur.execute("SELECT e.hire_date, d.dept_name FROM employees e JOIN departments d ON e.emp_id = d.emp_id WHERE e.salary = (SELECT MIN(salary) FROM employees WHERE emp_id IN (SELECT emp_id FROM departments));")
+lowest_paid_employee_info = cur.fetchone()
+print(f"Hiring date and department of the lowest paid employee: {lowest_paid_employee_info}")
+
+# close database connection
+cur.close()
+conn.close()
